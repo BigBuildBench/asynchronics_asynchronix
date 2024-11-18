@@ -1,0 +1,59 @@
+[package]
+name = "asynchronix"
+# When incrementing version and releasing to crates.io:
+# - Update crate version in this Cargo.toml
+# - Update crate version in README.md
+# - Update crate version in the lib.rs documentation of feature flags
+# - Update CHANGELOG.md
+# - Update if necessary copyright notice in LICENSE-MIT
+# - Create a "vX.Y.Z" git tag
+authors = ["Serge Barral <serge.barral@asynchronics.com>"]
+version = "0.2.2"
+edition = "2021"
+rust-version = "1.77.0"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/asynchronics/asynchronix"
+readme = "../README.md"
+description = """
+A high performance asychronous compute framework for system simulation.
+"""
+categories = ["simulation", "aerospace", "science"]
+keywords = ["simulation", "discrete-event", "systems", "cyberphysical", "real-time"]
+autotests = false
+
+[features]
+# gRPC service.
+grpc = ["dep:bytes", "dep:ciborium", "dep:prost", "dep:prost-types", "dep:serde", "dep:tonic", "dep:tokio", "dep:tonic"]
+tracing = ["dep:tracing", "dep:tracing-subscriber"]
+
+# DEVELOPMENT ONLY: API-unstable public exports meant for external test/benchmarking.
+dev-hooks = []
+
+[dependencies]
+
+[dev-dependencies]
+atomic-wait = "1.1"
+futures-util = "0.3"
+futures-executor = "0.3"
+mio = { version = "1.0", features = ["os-poll", "net"] }
+tracing-subscriber = { version= "0.3.18", features=["env-filter"] }
+
+[target.'cfg(asynchronix_loom)'.dev-dependencies]
+loom = "0.5"
+waker-fn = "1.1"
+
+[target.'cfg(asynchronix_grpc_codegen)'.build-dependencies]
+tonic-build = { version = "0.12" }
+
+[lints.rust]
+# `asynchronix_loom` flag: run loom-based tests.
+# `asynchronix_grpc_codegen` flag: regenerate gRPC code from .proto definitions. 
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(asynchronix_loom)', 'cfg(asynchronix_grpc_codegen)'] }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[[test]]
+name = "integration"
+path = "tests/tests.rs"

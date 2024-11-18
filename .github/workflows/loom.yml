@@ -1,0 +1,35 @@
+name: Loom
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+    paths:
+      - 'asynchronix/src/channel.rs'
+      - 'asynchronix/src/channel/**'
+      - 'asynchronix/src/executor/task.rs'
+      - 'asynchronix/src/executor/task/**'
+      - 'asynchronix/src/loom_exports.rs'
+      - 'asynchronix/src/ports/output/broadcaster.rs'
+      - 'asynchronix/src/ports/output/broadcaster/**'
+      - 'asynchronix/src/ports/source/broadcaster.rs'
+      - 'asynchronix/src/ports/source/broadcaster/**'
+      - 'asynchronix/src/util/cached_rw_lock.rs'
+      - 'asynchronix/src/util/slot.rs'
+      - 'asynchronix/src/util/sync_cell.rs'
+
+jobs:
+  loom:
+    name: Loom
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run cargo test (Loom)
+        run: cargo test --tests --release
+        env:
+          RUSTFLAGS: --cfg asynchronix_loom
